@@ -11,6 +11,13 @@ std::uintptr_t fixed6(std::uintptr_t a, std::uintptr_t b, std::uintptr_t c,
   return a + b + c + d + e + f;
 }
 
+std::uintptr_t vari() { return 0; }
+
+template <typename... inttypes> //
+std::uintptr_t vari(std::uintptr_t v0, inttypes... rest) {
+  return v0 + vari(rest...);
+}
+
 template <typename proc_t>
 void bench(char const *title, std::uintptr_t num, proc_t proc) {
   auto t0 = clock::now();
@@ -23,11 +30,17 @@ void bench(char const *title, std::uintptr_t num, proc_t proc) {
       std::chrono::duration_cast<std::chrono::microseconds>(t1 - t0).count();
   std::cout << title << " " << diff_us << "μs " << sum << std::endl;
 }
+
 } // namespace
 
 int main(int argc, char const *argv[]) {
   std::uintptr_t num = argc < 2 ? 100 : std::atoi(argv[1]);
   for (std::uintptr_t i = 0; i < 3; ++i) {
     bench("fixed", num, fixed6);
+    using u = std::uintptr_t;
+    bench("vari(F)", num, vari<u, u, u, u, u>);
+    bench("vari(L)", num, [](u a, u b, u c, u d, u e, u f) -> u {
+      return vari(a, b, c, d, e, f);
+    });
   }
 }
