@@ -26,8 +26,8 @@ void bench(char const *title, std::uintptr_t num, proc_t proc) {
   }
   auto t1 = std_clock::now();
   auto diff_us =
-      std::chrono::duration_cast<std::chrono::microseconds>(t1 - t0).count();
-  std::cout << title << " " << diff_us << "μs " << sum << std::endl;
+      std::chrono::duration_cast<std::chrono::nanoseconds>(t1 - t0).count();
+  std::cout << title << " " << (diff_us * 1e-6) << "ms " << sum << std::endl;
 }
 
 int main(int argc, char const *argv[]) {
