@@ -1,4 +1,12 @@
-all : main a.clang.out a.gcc9.out
+run : main a.clang.out a.gcc9.out
+	echo go
+	./main 10000000 | tail -2
+	echo
+	echo clang
+	./a.clang.out  10000000 | tail -4
+	echo
+	echo gcc9
+	./a.gcc9.out  10000000 | tail -4
 
 main: main.go makefile
 	go build main.go
