@@ -3,8 +3,7 @@
 #include <cstdlib>
 #include <iostream>
 
-namespace {
-using clock = std::chrono::high_resolution_clock;
+using std_clock = std::chrono::high_resolution_clock;
 
 std::uintptr_t fixed6(std::uintptr_t a, std::uintptr_t b, std::uintptr_t c,
                       std::uintptr_t d, std::uintptr_t e, std::uintptr_t f) {
@@ -20,24 +19,25 @@ std::uintptr_t vari(std::uintptr_t v0, inttypes... rest) {
 
 template <typename proc_t>
 void bench(char const *title, std::uintptr_t num, proc_t proc) {
-  auto t0 = clock::now();
+  auto t0 = std_clock::now();
   std::uintptr_t sum = 0;
   for (std::uintptr_t i = 0; i < num; ++i) {
     sum += proc(i & 1, i & 2, i & 4, i & 8, i & 16, i & 32);
   }
-  auto t1 = clock::now();
+  auto t1 = std_clock::now();
   auto diff_us =
       std::chrono::duration_cast<std::chrono::microseconds>(t1 - t0).count();
   std::cout << title << " " << diff_us << "μs " << sum << std::endl;
 }
 
-} // namespace
-
 int main(int argc, char const *argv[]) {
   std::uintptr_t num = argc < 2 ? 100 : std::atoi(argv[1]);
+  using u = std::uintptr_t;
   for (std::uintptr_t i = 0; i < 3; ++i) {
     bench("fixed", num, fixed6);
-    using u = std::uintptr_t;
+    bench("fixed(L)", num, [](u a, u b, u c, u d, u e, u f) -> u {
+      return fixed6(a, b, c, d, e, f);
+    });
     bench("vari(F)", num, vari<u, u, u, u, u>);
     bench("vari(L)", num, [](u a, u b, u c, u d, u e, u f) -> u {
       return vari(a, b, c, d, e, f);
