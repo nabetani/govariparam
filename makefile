@@ -1,5 +1,7 @@
-all : a.clang.out a.gcc9.out
+all : main a.clang.out a.gcc9.out
 
+main: main.go makefile
+	go build main.go
 
 a.clang.out : makefile main.cpp
 	clang++ -std=c++17 -O2 -Wall main.cpp -o a.clang.out
